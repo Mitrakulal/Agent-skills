@@ -1,6 +1,6 @@
 ---
 name: presentation-maker
-description: Build interactive, click-to-reveal slide decks — one point popping in at a time with a spring animation, floating transparent PNG cut-outs, a big image stage, and live interactive demos. Use when the user asks for a presentation, slides, a deck, or a ppt, or wants an existing talk turned into a deck. Do not use for a static document, a report, or a slide file that must open in PowerPoint — the interactivity lives in a self-contained HTML deck (see "Medium rule").
+description: Build interactive, click-to-reveal slide decks — one point popping in at a time with a spring animation, floating transparent PNG cut-outs, a big image stage, and live interactive demos. Use when the user asks for a presentation, slides, a deck, or a ppt, or wants an existing talk turned into a deck. Do not use for a static document or a report. The full mechanism lives in a self-contained HTML deck, but the reveal pacing can also be built in PowerPoint or Canva — see "PowerPoint and Canva mapping".
 metadata:
   version: "1"
 ---
@@ -14,11 +14,59 @@ self-contained HTML file. It is not a PowerPoint file.
 
 ## Medium rule
 
-The interactive mechanism — click-to-reveal, spring pops, live demos — only
-exists in the HTML deck. A static `.pptx` cannot reproduce it. If the user
-asks for a PowerPoint file, say so plainly, build the HTML deck as the
-interactive version, and offer a static export only as a handout. Never claim
-a `.pptx` will behave like the deck.
+The full mechanism — click-to-reveal pacing, spring pops, live demos, the
+overview grid and fullscreen chrome — only exists together in the HTML deck.
+But the heart of it, the reveal pacing, can be built in PowerPoint and
+Canva too (see "PowerPoint and Canva mapping"). If the user asks for a
+PowerPoint file, build the reveal in PowerPoint's own animation system
+rather than saying it cannot be done — and say plainly that the live demos
+do not transfer: those need code, so they become a static image or a video
+of the demo instead. Never claim a `.pptx` will behave like the HTML deck.
+
+## PowerPoint and Canva mapping
+
+When the user wants the deck in PowerPoint or Canva instead of HTML, map
+the mechanism like this. The reveal pacing survives; the live demos and
+the exact spring easing do not.
+
+### PowerPoint
+
+- One point per click: give each point its own text box or shape (one box
+  holding many lines reveals as a single object), then open the Animation
+  Pane and set each entrance animation to Start: On Click, in order. Each
+  click during the show triggers exactly the next animation — that is the
+  reveal system.
+- The pop: entrance effect "Zoom" is closest to the spring pop; "Bounce"
+  is the springy-feeling alternative. Set duration to about 0.35 s.
+- Transparent PNG cut-outs work exactly as in the HTML deck: insert the
+  PNG and its transparency is kept. Place it floating on the slide, no
+  box, no frame.
+- Flow slide big stage: put the stage images on the slide and give each
+  an Appear or Zoom entrance on click in checkpoint order, or use a Morph
+  transition between duplicate slides for a smooth swap.
+- Big-word slides: plain slides, no animations needed.
+- Does not transfer: live demos (draggable object + streaming numbers,
+  brain loop). Replace with a still image of the demo or a short video of
+  it running. No overview grid, no fullscreen chrome beyond the
+  presenter's own slideshow controls.
+
+### Canva
+
+- One point per click: select an element, click Animate, choose an effect
+  ("Pop" is closest to the spring pop; also Bounce, Fade, Rise), then
+  turn on "Appear on click" under Presentation settings and set the order
+  in "Click order". Each click in Present mode reveals the next element
+  in that order.
+- Each point must be its own text box — one box holding many lines reveals
+  as a single element, so split the lines first. Group an icon with its
+  text so they appear together on one click.
+- Limits (Canva Help Center): each animation can run at most 10 seconds,
+  and a design can hold at most 50 animations you created yourself.
+- Transparent PNGs work: upload a PNG with transparency (Canva Pro also
+  has a Background Remover). Float the cut-out on the slide, no frame.
+- Does not transfer: live demos; the exact spring overshoot easing (Pop
+  is close but fixed); no overview grid or presenter-controlled step-back
+  beyond the normal previous-slide control.
 
 ## What a deck built by this skill guarantees
 

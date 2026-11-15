@@ -36,6 +36,9 @@ through it, `O` for the overview grid, `F` for fullscreen.
 
 ## One thing to know
 
-The interactivity lives in the HTML deck. A static `.pptx` cannot do
-click-pop reveals or live demos — if you need a PowerPoint file, the deck
-is the interactive version and the `.pptx` is only a static handout.
+The full mechanism — reveals, live demos, overview grid — lives in the
+HTML deck. The click-pop reveal itself can be rebuilt in PowerPoint
+(entrance animations, Start: On Click) or Canva (Animate → Appear on
+click → Click order) — see the mapping in `SKILL.md`. Only the live demos
+can't move: those need code, so they become a still image or a video of
+the demo instead.

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentation Maker — Template Deck</title>
+<!--
+  Presentation Maker template deck.
+  A minimal working demo of the mechanism described in SKILL.md:
+  click-to-reveal points with a spring pop, a flow slide with one big
+  swapping stage image, floating cut-outs, and big-word slides.
+  Images here are inline SVG stand-ins. In a real deck, replace each
+  stand-in with a transparent PNG cut-out (see SKILL.md, "PNG cut-outs").
+  Open this file in any browser. Click, arrow keys, Space, tap, or swipe.
+  O = overview grid, F = fullscreen.
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: #0b0e0c;
+    color: #f2f2f2;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  .deck { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 7vw;
+  }
+  .slide.active { display: flex; }
+
+  h1 { font-size: clamp(42px, 7vw, 96px); line-height: 1.05; font-weight: 800; }
+  h2 { font-size: clamp(30px, 4.5vw, 56px); line-height: 1.1; font-weight: 800; margin-bottom: 3vh; }
+  .accent { color: #ff7a1a; }
+  .kicker {
+    font-size: 15px; letter-spacing: 2px; text-transform: uppercase;
+    color: #9aa39c; margin-bottom: 2vh;
+  }
+  .point { font-size: clamp(19px, 2.4vw, 28px); line-height: 1.45; margin: 1.2vh 0; }
+
+  /* ---- the pop: every reveal uses this, nothing else ---- */
+  .reveal { opacity: 0; transform: translateY(12px) scale(0.92); }
+  .reveal.popped {
+    animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(12px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* ---- title slide ---- */
+  .title-slide { align-items: flex-start; }
+  .logo-mark { width: 180px; margin-bottom: 3vh; }
+  .title-row { display: flex; align-items: center; gap: 4vw; width: 100%; }
+  .title-cutout { width: clamp(160px, 22vw, 300px); filter: drop-shadow(0 18px 24px rgba(0,0,0,0.55)); flex-shrink: 0; }
+  .title-line-wrap { position: relative; width: 100%; margin-top: 3.5vh; }
+  .title-line { height: 6px; background: #ff7a1a; border-radius: 3px; width: 100%; }
+  .line-rider {
+    position: absolute; top: -13px; left: 0; width: 34px; height: 34px;
+    animation: ride 9s ease-in-out infinite alternate;
+  }
+  @keyframes ride {
+    from { transform: translateX(0) rotate(0deg); }
+    to   { transform: translateX(calc(100vw - 14vw - 34px)) rotate(360deg); }
+  }
+
+  /* ---- flow slide ---- */
+  .flow-wrap { display: flex; align-items: center; gap: 5vw; width: 100%; }
+  .flow-steps { flex: 1; }
+  .flow-step { font-size: clamp(22px, 3vw, 34px); font-weight: 700; margin: 2.2vh 0; color: #c9cec9; }
+  .flow-step.on { color: #f2f2f2; }
+  .stage { width: clamp(240px, 30vw, 380px); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .stage svg { width: 100%; height: auto; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.55)); }
+  .stage img { width: 100%; height: auto; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.55)); }
+
+  /* ---- component slide ---- */
+  .comp-wrap { display: flex; align-items: center; gap: 5vw; width: 100%; }
+  .comp-points { flex: 1; }
+  .comp-cutout { width: clamp(200px, 26vw, 340px); flex-shrink: 0; filter: drop-shadow(0 18px 24px rgba(0,0,0,0.55)); }
+
+  /* ---- big-word slide ---- */
+  .big-word { align-items: center; text-align: center; }
+  .big-word h1 { font-size: clamp(64px, 13vw, 180px); }
+
+  /* ---- chrome: dots, progress, counter, buttons ---- */
+  #progress { position: absolute; top: 0; left: 0; height: 4px; background: #ff7a1a; width: 0; z-index: 20; transition: width 0.25s ease; }
+  #dots {
+    position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 20;
+  }
+  #dots button {
+    width: 12px; height: 12px; border-radius: 50%; border: 2px solid #8a918a;
+    background: transparent; cursor: pointer; padding: 0;
+  }
+  #dots button.on { background: #ff7a1a; border-color: #ff7a1a; }
+  #counter {
+    position: absolute; bottom: 16px; right: 180px; z-index: 20;
+    font-size: 14px; color: #9aa39c; letter-spacing: 1px;
+  }
+  #counter.hidden { display: none; }
+  .nav-btn {
+    position: absolute; bottom: 12px; z-index: 20;
+    background: rgba(255,255,255,0.08); color: #f2f2f2; border: 1px solid #3a403a;
+    border-radius: 8px; padding: 8px 14px; font-size: 15px; cursor: pointer;
+  }
+  #prevBtn { left: 22px; }
+  #nextBtn { right: 90px; }
+  #fsBtn { right: 22px; }
+  .nav-btn:hover { background: rgba(255,255,255,0.16); }
+
+  /* ---- overview grid ---- */
+  #overview {
+    position: absolute; inset: 0; z-index: 30; display: none;
+    background: rgba(5,7,6,0.96); padding: 6vh 6vw;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px; overflow: auto;
+  }
+  #overview.open { display: grid; }
+  .ov-cell {
+    border: 1px solid #3a403a; border-radius: 10px; padding: 18px;
+    cursor: pointer; background: #12160f;
+  }
+  .ov-cell:hover { border-color: #ff7a1a; }
+  .ov-cell .n { font-size: 13px; color: #9aa39c; margin-bottom: 6px; }
+  .ov-cell .t { font-size: 18px; font-weight: 700; }
+
+  @media (max-width: 900px) {
+    .title-row, .flow-wrap, .comp-wrap { flex-direction: column; align-items: flex-start; }
+    .stage, .comp-cutout { margin-top: 3vh; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+  <div id="progress"></div>
+
+  <!-- Slide 1: Title — zero reveals, one click goes to slide 2 -->
+  <section class="slide title-slide active" data-title="Title">
+    <svg class="logo-mark" viewBox="0 0 200 60" aria-label="logo stand-in">
+      <rect x="4" y="10" width="40" height="40" rx="8" fill="none" stroke="#f2f2f2" stroke-width="3"/>
+      <path d="M14 30 L24 20 L34 30 L24 40 Z" fill="#ff7a1a"/>
+      <text x="56" y="38" fill="#f2f2f2" font-size="24" font-weight="800" font-family="sans-serif">DEMO</text>
+    </svg>
+    <div class="title-row">
+      <h1>Build the deck<br>that <span class="accent">pops.</span></h1>
+      <!-- stand-in cut-out: replace with a transparent PNG cut-out -->
+      <svg class="title-cutout" viewBox="0 0 200 200" aria-label="cut-out stand-in">
+        <circle cx="100" cy="100" r="70" fill="none" stroke="#f2f2f2" stroke-width="6"/>
+        <circle cx="100" cy="100" r="46" fill="none" stroke="#ff7a1a" stroke-width="6"/>
+        <path d="M100 55 L112 92 L100 84 L88 92 Z" fill="#ff7a1a"/>
+        <circle cx="100" cy="112" r="10" fill="#f2f2f2"/>
+      </svg>
+    </div>
+    <div class="title-line-wrap">
+      <div class="title-line"></div>
+      <svg class="line-rider" viewBox="0 0 34 34" aria-hidden="true">
+        <rect x="6" y="6" width="22" height="22" rx="5" fill="#ff7a1a"/>
+        <circle cx="13" cy="13" r="3" fill="#0b0e0c"/>
+        <circle cx="21" cy="21" r="3" fill="#0b0e0c"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Slide 2: Flow — checkpoints left, one big stage right -->
+  <section class="slide" data-title="Our Flow Today">
+    <h2>Our flow today</h2>
+    <div class="flow-wrap">
+      <div class="flow-steps">
+        <div class="flow-step reveal" data-stage="0">Understand</div>
+        <div class="flow-step reveal" data-stage="1">Build</div>
+        <div class="flow-step reveal" data-stage="2">Present</div>
+      </div>
+      <div class="stage" id="stage">
+        <svg data-stage-img="0" viewBox="0 0 200 200" aria-label="bulb stand-in">
+          <circle cx="100" cy="88" r="52" fill="#ffd23f"/>
+          <rect x="82" y="138" width="36" height="10" rx="3" fill="#9aa39c"/>
+          <rect x="86" y="152" width="28" height="10" rx="3" fill="#9aa39c"/>
+          <path d="M100 30 L106 48 L100 44 L94 48 Z" fill="#ffd23f"/>
+        </svg>
+        <svg data-stage-img="1" viewBox="0 0 200 200" style="display:none" aria-label="gears stand-in">
+          <circle cx="80" cy="90" r="44" fill="none" stroke="#c9cec9" stroke-width="10"/>
+          <circle cx="80" cy="90" r="16" fill="none" stroke="#c9cec9" stroke-width="8"/>
+          <circle cx="138" cy="130" r="30" fill="none" stroke="#ff7a1a" stroke-width="10"/>
+          <circle cx="138" cy="130" r="10" fill="none" stroke="#ff7a1a" stroke-width="8"/>
+        </svg>
+        <svg data-stage-img="2" viewBox="0 0 200 200" style="display:none" aria-label="flag stand-in">
+          <rect x="60" y="30" width="8" height="140" rx="4" fill="#c9cec9"/>
+          <path d="M68 34 L150 56 L68 82 Z" fill="#ff7a1a"/>
+          <circle cx="100" cy="150" r="26" fill="none" stroke="#f2f2f2" stroke-width="6"/>
+          <path d="M92 150 L100 142 L108 150 L100 158 Z" fill="#f2f2f2"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Component — kicker, points, floating cut-out -->
+  <section class="slide" data-title="Meet Your Kit">
+    <div class="kicker">The kit · Part 1 of 3</div>
+    <h2>Meet your kit</h2>
+    <div class="comp-wrap">
+      <div class="comp-points">
+        <p class="point reveal">One board, one sensor, one motor — that is the whole kit.</p>
+        <p class="point reveal">Every part floats on the slide as a cut-out, never a boxed photo.</p>
+        <p class="point reveal">Each point pops in exactly when it is spoken, never before.</p>
+      </div>
+      <!-- stand-in cut-out: replace with a transparent PNG cut-out -->
+      <svg class="comp-cutout" viewBox="0 0 200 200" aria-label="board cut-out stand-in">
+        <rect x="30" y="50" width="140" height="100" rx="10" fill="#1c211a" stroke="#3a403a" stroke-width="2"/>
+        <rect x="48" y="68" width="52" height="34" rx="4" fill="#0b0e0c" stroke="#ff7a1a" stroke-width="2"/>
+        <circle cx="140" cy="85" r="12" fill="none" stroke="#f2f2f2" stroke-width="3"/>
+        <rect x="48" y="116" width="104" height="8" rx="4" fill="#3a403a"/>
+        <rect x="48" y="130" width="70" height="8" rx="4" fill="#3a403a"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Slide 4: Big-word — no reveals, no counter -->
+  <section class="slide big-word" data-title="Thank You" data-hide-counter="true">
+    <h1>THANK <span class="accent">YOU</span></h1>
+  </section>
+
+  <div id="dots"></div>
+  <div id="counter"></div>
+  <button class="nav-btn" id="prevBtn" aria-label="Back">&#8592; Back</button>
+  <button class="nav-btn" id="nextBtn" aria-label="Next">Next &#8594;</button>
+  <button class="nav-btn" id="fsBtn" aria-label="Fullscreen">&#9974;</button>
+
+  <div id="overview"></div>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dotsBox = document.getElementById('dots');
+  var progress = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var overview = document.getElementById('overview');
+  var cur = 0, step = 0;
+
+  function reveals(i) { return slides[i].querySelectorAll('.reveal'); }
+  function totalSteps() {
+    return slides.reduce(function (n, s) { return n + s.querySelectorAll('.reveal').length + 1; }, 0);
+  }
+  function doneSteps() {
+    var n = 0;
+    for (var i = 0; i < cur; i++) n += reveals(i).length + 1;
+    return n + step;
+  }
+
+  function show(i, s) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    var revs = reveals(cur);
+    step = Math.max(0, Math.min(revs.length, s));
+    slides.forEach(function (sl, idx) { sl.classList.toggle('active', idx === cur); });
+    revs.forEach(function (el, idx) {
+      var on = idx < step;
+      el.classList.toggle('popped', on);
+      if (el.classList.contains('flow-step')) el.classList.toggle('on', on);
+    });
+    syncStage();
+    dotsBox.querySelectorAll('button').forEach(function (b, idx) {
+      b.classList.toggle('on', idx === cur);
+    });
+    progress.style.width = (cur === slides.length - 1 ? 100 : doneSteps() / totalSteps() * 100) + '%';
+    counter.textContent = (cur + 1) + ' / ' + slides.length;
+    counter.classList.toggle('hidden', slides[cur].getAttribute('data-hide-counter') === 'true');
+  }
+
+  function syncStage() {
+    var stage = document.getElementById('stage');
+    if (!stage) return;
+    var revs = reveals(cur);
+    var last = -1;
+    revs.forEach(function (el, idx) {
+      if (idx < step && el.hasAttribute('data-stage')) last = parseInt(el.getAttribute('data-stage'), 10);
+    });
+    var imgs = stage.querySelectorAll('[data-stage-img]');
+    imgs.forEach(function (img) {
+      var showIt = parseInt(img.getAttribute('data-stage-img'), 10) === (last < 0 ? 0 : last);
+      if (showIt && img.style.display === 'none') {
+        img.style.display = '';
+        img.classList.remove('popped');
+        void img.offsetWidth; /* restart the pop */
+        img.classList.add('popped');
+        img.style.animation = 'pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+      } else if (!showIt) {
+        img.style.display = 'none';
+      }
+    });
+  }
+
+  function next() {
+    var revs = reveals(cur);
+    if (step < revs.length) { show(cur, step + 1); return; }
+    if (cur < slides.length - 1) show(cur + 1, 0);
+  }
+  function prev() {
+    if (step > 0) { show(cur, step - 1); return; }
+    if (cur > 0) show(cur - 1, reveals(cur - 1).length);
+  }
+
+  slides.forEach(function (sl, idx) {
+    var b = document.createElement('button');
+    b.setAttribute('aria-label', 'Go to slide ' + (idx + 1));
+    b.addEventListener('click', function (e) { e.stopPropagation(); show(idx, 0); });
+    dotsBox.appendChild(b);
+    var cell = document.createElement('div');
+    cell.className = 'ov-cell';
+    cell.innerHTML = '<div class="n">Slide ' + (idx + 1) + '</div><div class="t"></div>';
+    cell.querySelector('.t').textContent = sl.getAttribute('data-title') || ('Slide ' + (idx + 1));
+    cell.addEventListener('click', function () { overview.classList.remove('open'); show(idx, 0); });
+    overview.appendChild(cell);
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function (e) { e.stopPropagation(); next(); });
+  document.getElementById('prevBtn').addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+  document.getElementById('fsBtn').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  });
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('button') || e.target.closest('#overview')) return;
+    next();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'o' || e.key === 'O') overview.classList.toggle('open');
+    else if (e.key === 'f' || e.key === 'F') document.getElementById('fsBtn').click();
+    else if (e.key === 'Home') show(0, 0);
+    else if (e.key === 'End') show(slides.length - 1, reveals(slides.length - 1).length);
+    else if (e.key === 'Escape') overview.classList.remove('open');
+  });
+  var touchX = null;
+  document.addEventListener('touchstart', function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    if (dx < -40) next();
+    else if (dx > 40) prev();
+    touchX = null;
+  }, { passive: true });
+
+  show(0, 0);
+})();
+</script>
+</body>
+</html>

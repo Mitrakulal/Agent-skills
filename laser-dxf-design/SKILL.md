@@ -139,6 +139,29 @@ explicitly asks for kerf compensation, offset the cut profile inward by
 - The preview must render the **DXF**, not the source art. Filled art and
   outline art look different; the shop cuts the outline.
 
+### Tracing a logo from a reference image
+
+Never draw a logo from memory. Memory of a famous logo is confidently
+wrong — the GTA V "V" was remembered as one V with an engraved stripe;
+the real one is two separate pieces with a diagonal gap. Extract the shape
+from the pixels:
+
+- Mask by colour: the logo colour against the background (e.g. purple
+  pixels where B−G and R−G are large and B is high; a grey background has
+  R≈G≈B, so it drops out).
+- Clean the mask: binary closing to bridge texture gaps, then fill holes.
+  Keep the largest components — each one is a separate cut piece.
+- Trace each component with marching squares (`matplotlib.pyplot.contour`
+  at level 0.5 works when cv2/skimage are unavailable).
+- Simplify to 0.05–0.1 mm, then idealise to straight edges by hand from
+  the traced vertices. Traced pixels are noisy, but the vertex positions
+  are the truth — check the simplified polygon against the image.
+- Scale the traced bbox into the target box (fit, don't stretch) and place
+  it like any other piece.
+- Verify with a real side-by-side: the reference crop next to a render of
+  the DXF, at the same height. Attach the actual comparison image when you
+  claim to show one — a layout preview is not a comparison.
+
 ## Step 6 — Validate
 
 Run the bundled validator:
@@ -359,3 +382,18 @@ layer scheme and export package stayed identical.
 - Measuring a photo without correcting perspective — use an orthographic
   vendor drawing or measure the part.
 - R12 has no `$INSUNITS` — state mm in `DETAILS.md`.
+- A diagonal "stripe" in a logo may be a gap, not a mark. A line that
+  separates two shapes is a gap between two cut pieces; an engraved stripe
+  on one piece is a different part. Check the source pixels before deciding
+  cut vs engrave.
+- Fitting each glyph to its own box: when the user gives a per-character
+  box (e.g. 15 × 10 mm), fit each glyph's FULL bbox — descenders and
+  ascenders included — into it. Letters with descenders/ascenders (g, d,
+  h) will read slightly smaller than x-height letters; say so, don't
+  silently stretch.
+- Bold fonts at small sizes have hairline counters: Pricedown at 10 mm
+  letter height has 0.6–0.8 mm counter slots. They cut, but flag a test
+  cut; the fallback is engraving the counters instead of cutting them.
+- Flattening font curves: this fontTools build has no `FlattenPen` — write
+  your own subdivision pen (de Casteljau, tol ~1 font unit) instead of
+  hunting for the import.

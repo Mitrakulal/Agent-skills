@@ -2,20 +2,23 @@
 
 A skill that teaches an agent to design and export manufacturable 2D DXF
 files for laser cutting and engraving — mechanical plates, brackets,
-chassis, and decorative logo art. The output is a shop-ready package: the
-DXF, two previews, and a details sheet. No source code in the package.
+chassis, and decorative logo/text art. The output is a shop-ready package:
+the DXF, two previews, and a details sheet. No source code in the package.
 
 ## What's inside
 
 - `SKILL.md` — the complete workflow: intake, DXF dialect, layers,
-  mechanical and decorative design, validation gates, export package, and
-  handling design changes without hand-editing the DXF.
+  mechanical and decorative design, text/glyph sets, logo tracing,
+  validation gates, export package, and handling design changes without
+  hand-editing the DXF.
 - `scripts/validate_dxf.py` — pre-cut validator: closed contours, hole
   counts, extents, minimum webs, duplicates, audit.
 - `references/chassis-200x140.md` — worked mechanical example (acrylic
   chassis, 4 clamp stations, 2 L298N boards, R12).
 - `references/diya-logo-150.md` — worked decorative example (150 × 150
   logo, AC1015, nested contours, small-feature risks).
+- `references/gta-v-charset.md` — worked text/logo example (11 unique
+  letters + 2-piece V, 15 × 10 mm boxes, R12, hairline counters, real gap).
 
 ## Install
 

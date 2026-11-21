@@ -58,6 +58,17 @@ RESULT: PASS
 - Washers under M3 heads: the 2.3 mm edge web is the weak point in 3 mm
   acrylic.
 
+## 250 mm variant (current)
+
+Same design, plate length changed from 200 to 250 mm:
+
+- rear clamp stations move to Y 200–240 (holes at Y 205 / 235);
+- L298N centres move to Y 211.5 (holes at Y 193 / 230);
+- title engraving becomes `CHASSIS 250x140x3`;
+- hole sizes, pitches, layers and the 4-file export package are unchanged.
+
+Everything else in this reference still applies.
+
 ## Files in this reference
 
 - `chassis-200x140_preview.png` — annotated top view.

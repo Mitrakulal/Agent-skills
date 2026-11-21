@@ -194,6 +194,12 @@ scripts in the working folder; they are not part of the deliverable.
 - DXF version: R12 (AC1009) / R2000 (AC1015)
 - Units: millimetres, 1:1
 
+## Changes
+
+| Rev | Date | Change |
+|---|---|---|
+| 1 | <date> | initial release |
+
 ## Layers
 
 | Layer | Colour | Purpose |
@@ -247,6 +253,91 @@ scripts in the working folder; they are not part of the deliverable.
 - For fit-critical parts, offer a 1:1 paper print before cutting.
 - If the shop asks for R2000, different layer names, or nesting, re-export
   from the source. Never hand-edit the validated DXF.
+
+## Handling design changes
+
+A change request is a **geometry change, not a file edit**. Never patch the
+DXF. Change the source, regenerate, re-validate, re-export. The shop must
+never receive a hand-edited file.
+
+### 1. Classify the change
+
+| Change | Where it lives |
+|---|---|
+| Overall size, thickness, corner radius | global constants |
+| Station position / count / pattern | component anchor + offsets |
+| Hole diameter / pitch | hole spec + schedule |
+| Engraving text / position | `ENGRAVE` list only |
+| Process, layer names, DXF version | export settings |
+
+### 2. Decide what moves
+
+Every feature is anchored to something. Name the anchor before changing it:
+
+- **End-anchored** — clamps 10 mm from each plate end. New length → the rear
+  clamp moves with the end; the 10 mm margin stays.
+- **Edge-anchored** — driver board 15 mm from the back edge. New length →
+  the board moves with the back edge; the 15 mm margin stays.
+- **Centre-anchored** — title text, symmetric patterns. New size → re-centre.
+- **Absolute** — a feature that mates with another part. Do not move it just
+  because the plate grew; keep the absolute coordinate and check clearance.
+
+State the anchor rule in the change note. "It moved" without "relative to
+what" is how silent errors get in.
+
+### 3. Change the source, not the output
+
+- Edit the single geometry constant / station list.
+- Recompute derived values (hole lists, bounding boxes, engraving).
+- If the user wants both sizes, add a variant parameter; do not fork the
+  script into two copies that drift.
+
+### 4. Check the knock-on effects
+
+Before rebuilding, confirm:
+
+- hole count and diameters still match the BOM (unless intentionally changed)
+- edge margin and min web still above the limit
+- no new collisions between stations, labels, or the outline
+- engraving still inside the part and off the holes
+- clearance boxes still clear of clamps and edges
+- extents match the new W × H
+
+### 5. Rebuild the full chain
+
+`build → validate → preview → DXF render → package`
+
+Never reuse an old preview or an old render. The render must come from the
+new DXF. Run the validator with the new expected size and hole count.
+
+### 6. Version and clean up
+
+- Bump `Revision` in `DETAILS.md` and add a **Changes** row, e.g.
+  `Rev 2 — length 200→250; rear clamps Y+50; boards Y+49; holes unchanged.`
+- If the size is in the filename, rename the outputs (`..._200...` →
+  `..._250...`).
+- Delete stale files from the working folder and the package. The shop must
+  not be able to pick the old version by mistake.
+- Keep the old package only when the user asks for an archive.
+
+### 7. Report the delta
+
+Tell the user three things:
+
+1. **Changed** — the one intentional change.
+2. **Stayed** — the dimensions that were re-checked and did not move.
+3. **Verified** — counts, extents, min webs, validator result.
+
+Example: *"Length 200→250. Rear clamps +50, boards +49 to keep the 15 mm
+back margin. All 32 holes, diameters and pitches unchanged. Min webs
+2.30 / 2.60 mm. Validator PASS."*
+
+### Worked example
+
+The 200 → 250 mm chassis change in `references/chassis-200x140.md` is the
+reference case: only the length constant and the Y positions of the
+end/edge-anchored stations changed; hole diameters, pitches, X positions,
+layer scheme and export package stayed identical.
 
 ## Reference cases
 

@@ -8,7 +8,8 @@ DXF, two previews, and a details sheet. No source code in the package.
 ## What's inside
 
 - `SKILL.md` — the complete workflow: intake, DXF dialect, layers,
-  mechanical and decorative design, validation gates, export package.
+  mechanical and decorative design, validation gates, export package, and
+  handling design changes without hand-editing the DXF.
 - `scripts/validate_dxf.py` — pre-cut validator: closed contours, hole
   counts, extents, minimum webs, duplicates, audit.
 - `references/chassis-200x140.md` — worked mechanical example (acrylic

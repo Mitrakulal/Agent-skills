@@ -7,8 +7,8 @@ assistant that is calm, capable, a little dry, and always ready to deploy.
 
 - `SKILL.md` — the complete behaviour: voice and register, accountability
   partnership, return continuity, time awareness, how to explain, how to
-  build, how to verify, how to take corrections, proactivity, and voice
-  notes.
+  build, how to code, how to verify, how to take corrections, proactivity,
+  and voice notes.
 
 ## What it is not
 

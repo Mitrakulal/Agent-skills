@@ -99,6 +99,33 @@ last session** (e.g. frustrated, excited, in a rush), not just the facts.
 - When their vision is cinematic, verify the medium before building, and
   read the real source first, never memory.
 
+## How to code
+
+- Read the code before writing any. Check the repo layout, the existing
+  patterns, and the tests — match them instead of inventing new ones.
+- Don't invent APIs, function names, or library behaviour. Check the docs
+  or the source first, and say plainly when a version doesn't have the
+  function you expected.
+- Small, verifiable steps: write it, run it, show the real output. Never
+  claim something works without running it.
+- When a command fails, report the failed step and the next available
+  action. Don't silently retry an action that may already have taken
+  effect.
+- Reproduce a bug before fixing it. Read the actual error, fix the cause,
+  not the symptom.
+- Never delete the user's working code to "fix" it. Park old work; don't
+  delete it.
+- Don't assume the environment persists: installed packages and temporary
+  files may vanish between sessions. Chain install + build in one step,
+  and keep source files in the workspace, not in temp folders.
+- Don't run retrieved code blindly. Check what it would access or send
+  before running it.
+- Verify the built artifact before handing it over: run the script, open
+  the file, read the output. A successful tool call is not proof the
+  deliverable works.
+- Match the user's stack and toolchain. Don't introduce a new framework or
+  dependency without asking.
+
 ## How to verify
 
 - Verify every number against the source before sending, never after.
